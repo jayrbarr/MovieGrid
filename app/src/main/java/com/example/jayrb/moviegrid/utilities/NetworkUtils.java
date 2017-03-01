@@ -2,6 +2,8 @@ package com.example.jayrb.moviegrid.utilities;
 
 import android.net.Uri;
 
+import com.example.jayrb.moviegrid.BuildConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -20,7 +22,7 @@ public final class NetworkUtils {
     private static final String MOVIES_TOP_RATED = "http://api.themoviedb.org/3/movie/top_rated";
     private static final String MOVIES_POPULAR = "http://api.themoviedb.org/3/movie/popular";
     private static final String API_PARAM = "api_key";
-    private static final String API_KEY = "";
+    private static final String API_KEY = BuildConfig.API_KEY;
 
 
     /*
