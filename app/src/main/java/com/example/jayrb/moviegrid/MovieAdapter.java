@@ -20,21 +20,12 @@ import java.util.ArrayList;
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder>{
 
     public static final String FETCH_IMAGE_URL_BASE = "http://image.tmdb.org/t/p/w185";
-    private ArrayList<String[]> mMovieList;
-
     /*
     * An on-click handler to make it easy for an Activity to interface with
     * our RecyclerView
     */
     private final MovieAdapterOnClickHandler mClickHandler;
-
-    /**
-     * The interface that receives onClick messages.
-     */
-    public interface MovieAdapterOnClickHandler {
-        void onClick(String[] movieDetail);
-    }
-
+    private ArrayList<String[]> mMovieList;
 
     public MovieAdapter(MovieAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
@@ -43,8 +34,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     @Override
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_movie, null);
-        MovieViewHolder movieViewHolder = new MovieViewHolder(layoutView);
-        return movieViewHolder;
+        return new MovieViewHolder(layoutView);
     }
 
     @Override
@@ -53,13 +43,36 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         String thumbUrl = FETCH_IMAGE_URL_BASE + thumbPath;
         Uri uri = Uri.parse(thumbUrl);
         Context context = holder.mMovieThumb.getContext();
-        Picasso.with(context).load(uri).into(holder.mMovieThumb);
+        Picasso.with(context)
+                .load(uri)
+                .placeholder(R.mipmap.ic_launcher)
+                .error(R.mipmap.ic_launcher)
+                .into(holder.mMovieThumb);
     }
 
     @Override
     public int getItemCount() {
         if (null == mMovieList) return 0;
         return mMovieList.size();
+    }
+
+    /**
+     * This method is used to set the movie data on a MovieAdapter if we've already
+     * created one. This is handy when we get new data from the web but don't want to create a
+     * new MovieAdapter to display it.
+     *
+     * @param movieData The new movie data to be displayed.
+     */
+    public void setMovieData(ArrayList<String[]> movieData) {
+        mMovieList = movieData;
+        notifyDataSetChanged();
+    }
+
+    /**
+     * The interface that receives onClick messages.
+     */
+    public interface MovieAdapterOnClickHandler {
+        void onClick(String[] movieDetail);
     }
 
     /**
@@ -86,18 +99,5 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             String[] movieDetail = mMovieList.get(adapterPosition);
             mClickHandler.onClick(movieDetail);
         }
-    }
-
-
-    /**
-     * This method is used to set the movie data on a MovieAdapter if we've already
-     * created one. This is handy when we get new data from the web but don't want to create a
-     * new MovieAdapter to display it.
-     *
-     * @param movieData The new movie data to be displayed.
-     */
-    public void setMovieData(ArrayList<String[]> movieData) {
-        mMovieList = movieData;
-        notifyDataSetChanged();
     }
 }
