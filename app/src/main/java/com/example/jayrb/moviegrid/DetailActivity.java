@@ -2,8 +2,8 @@ package com.example.jayrb.moviegrid;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,16 +18,17 @@ import static com.example.jayrb.moviegrid.MovieAdapter.FETCH_IMAGE_URL_BASE;
 
 public class DetailActivity extends AppCompatActivity {
 
+    public static final int THUMB_URL = 0;
+    public static final int TITLE = 1;
+    public static final int SYNOPSIS = 2;
+    public static final int YEAR_OF_RELEASE = 3;
+    public static final int VOTER_AVERAGE = 4;
     private TextView mMovieTitle;
-    private TextView mMovieDisplay;
+    private TextView mMovieYear;
+    private TextView mMovieSynopsis;
+    private TextView mMovieRanking;
     private String[] mMovieDetails;
     private ImageView mDetailThumb;
-    private static final int THUMB_URL = 0;
-    private static final int TITLE = 1;
-    private static final int SYNOPSIS = 2;
-    private static final int RELEASE_DATE = 3;
-    private static final int VOTER_AVERAGE = 4;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +38,10 @@ public class DetailActivity extends AppCompatActivity {
         /* find appropriate views in layout */
 
         mMovieTitle = (TextView) findViewById(R.id.movie_title);
-        mMovieDisplay = (TextView) findViewById(R.id.display_movie_details);
+        mMovieYear = (TextView) findViewById(R.id.display_year_released);
         mDetailThumb = (ImageView) findViewById(R.id.detail_thumb);
+        mMovieSynopsis = (TextView) findViewById(R.id.detail_synopsis);
+        mMovieRanking = (TextView) findViewById(R.id.detail_rating);
 
         Intent intentThatStartedThisActivity = getIntent();
 
@@ -51,15 +54,9 @@ public class DetailActivity extends AppCompatActivity {
 
                 mMovieTitle.setText(mMovieDetails[TITLE]);
 
-                String movieDetails = mMovieDetails[SYNOPSIS]
-                        + getString(R.string.double_line_feed)
-                        + getString(R.string.release_date)
-                        + mMovieDetails[RELEASE_DATE]
-                        + getString(R.string.double_line_feed)
-                        + getString(R.string.voter_average)
-                        + mMovieDetails[VOTER_AVERAGE];
-
-                mMovieDisplay.setText(movieDetails);
+                mMovieSynopsis.setText(mMovieDetails[SYNOPSIS]);
+                mMovieYear.setText(mMovieDetails[YEAR_OF_RELEASE]);
+                mMovieRanking.setText(mMovieDetails[VOTER_AVERAGE] + getString(R.string.voter_average));
             }
         }
 

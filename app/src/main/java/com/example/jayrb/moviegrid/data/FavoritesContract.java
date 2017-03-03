@@ -44,6 +44,6 @@ public class FavoritesContract {
        public static final String COLUMN_OVERVIEW = "overview";
        public static final String COLUMN_YEAR = "year";
        public static final String COLUMN_VOTE = "vote";
-       public static final String COLUMN_THUMBPATH = "thumbpath";
+       public static final String COLUMN_THUMB = "thumb";
    }
 }

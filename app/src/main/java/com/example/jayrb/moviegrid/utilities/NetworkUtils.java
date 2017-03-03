@@ -1,6 +1,8 @@
 package com.example.jayrb.moviegrid.utilities;
 
+import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.example.jayrb.moviegrid.BuildConfig;
 
@@ -19,29 +21,81 @@ public final class NetworkUtils {
 
     /* Constants to access Movie Database API */
 
-    private static final String MOVIES_TOP_RATED = "http://api.themoviedb.org/3/movie/top_rated";
-    private static final String MOVIES_POPULAR = "http://api.themoviedb.org/3/movie/popular";
+    private static final String MOVIES_TOP_RATED = "top_rated";
+    private static final String MOVIES_POPULAR = "popular";
+    private static final String MOVIES_REVIEWS = "reviews";
+    private static final String MOVIES_VIDEOS = "videos";
+
+    private static final String MOVIES_BASE = "https://api.themoviedb.org/3/movie";
     private static final String API_PARAM = "api_key";
     private static final String API_KEY = BuildConfig.API_KEY;
 
+    private static final int MOST_POPULAR = 0;
+    private static final int TOP_RATED = 1;
+    private static final int FAVORITES = 2;
+
+    private static final String TAG = NetworkUtils.class.getSimpleName();
 
     /*
     * Builds the URL to talk to the Movie Database server.
     * */
-    public static URL buildUrl (boolean selectPopular) {
+    public static URL buildUrl(Context context, int selection) {
         Uri builtUri;
-        if (selectPopular) {
-            builtUri = Uri.parse(MOVIES_POPULAR).buildUpon().appendQueryParameter(API_PARAM, API_KEY).build();
-        } else {
-            builtUri = Uri.parse(MOVIES_TOP_RATED).buildUpon().appendQueryParameter(API_PARAM, API_KEY).build();
+        Log.d(TAG, "selection = " + selection);
+        if (selection == MOST_POPULAR) {
+            builtUri = Uri.parse(MOVIES_BASE)
+                    .buildUpon()
+                    .appendPath(MOVIES_POPULAR)
+                    .appendQueryParameter(API_PARAM, API_KEY).build();
+        } else if (selection == TOP_RATED) {
+            builtUri = Uri.parse(MOVIES_BASE)
+                    .buildUpon()
+                    .appendPath(MOVIES_TOP_RATED)
+                    .appendQueryParameter(API_PARAM, API_KEY).build();
+        } else
+        // if (selection == FAVORITES) //
+        {
+            builtUri = Uri.parse(MOVIES_BASE)
+                    .buildUpon()
+                    .appendPath(MOVIES_TOP_RATED)
+                    .appendQueryParameter(API_PARAM, API_KEY).build();
         }
+        return uriToUrl(builtUri);
+    }
+
+    public static URL reviewsUrl(String id) {
+        Uri builtUri = Uri.parse(MOVIES_BASE)
+                .buildUpon()
+                .appendPath(id)
+                .appendPath(MOVIES_REVIEWS)
+                .appendQueryParameter(API_PARAM, API_KEY).build();
+        return uriToUrl(builtUri);
+    }
+
+    public static URL videosUrl(String id) {
+        Uri builtUri = Uri.parse(MOVIES_BASE)
+                .buildUpon()
+                .appendPath(id)
+                .appendPath(MOVIES_VIDEOS)
+                .appendQueryParameter(API_PARAM, API_KEY).build();
+        return uriToUrl(builtUri);
+    }
+
+    public static URL movieUrl(String id) {
+        Uri builtUri = Uri.parse(MOVIES_BASE)
+                .buildUpon()
+                .appendPath(id)
+                .appendQueryParameter(API_PARAM, API_KEY).build();
+        return uriToUrl(builtUri);
+    }
+
+    private static URL uriToUrl(Uri builtUri) {
         URL url = null;
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
         return url;
     }
 

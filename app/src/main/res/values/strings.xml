@@ -6,10 +6,36 @@
     <string-array name="spinner">
         <item>@string/most_popular</item>
         <item>@string/top_rated</item>
+        <item>@string/favorites</item>
     </string-array>
     <string name="most_popular">Most Popular</string>
     <string name="top_rated">Top Rated</string>
+    <string name="favorites">Favorites</string>
     <string name="double_line_feed" translatable="false">\n\n</string>
-    <string name="voter_average">Voter average:\u0020</string>
-    <string name="release_date">Release date:\u0020</string>
+    <string name="voter_average">/10</string>
+    <string name="runtime">min</string>
+
+    // Detail view button to mark as favorite
+    <string name="button_favorite">Mark As Favorite</string>
+
+    // Detail view content description
+    <string name="poster_content">Movie Poster</string>
+    <string name="section_divider">Section Divider</string>
+
+    // Detail view trailers heading
+    <string name="trailers">Trailers:</string>
+
+    // Default detail view strings
+    <string name="detail_synopsis">Every child comes into the world full of promise, and none more so than Chappie: he is gifted, special, a prodigy. Chappie he is a robot.</string>
+    <string name="detail_rating">8.1/10</string>
+    <string name="detail_runtime">120min</string>
+    <string name="detail_year">2015</string>
+    <string name="detail_title">Chappie</string>
+
+    // Preference Strings
+    <string name="settings_selection_label">Selection</string>
+    <string name="settings_selection_key" translatable="false">selection</string>
+    <string name="settings_selection_default">@string/most_popular</string>
+
+
 </resources>

@@ -2,12 +2,16 @@ package com.example.jayrb.moviegrid;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -32,28 +36,39 @@ import java.util.ArrayList;
 *  on each poster ImageView and, if clicked, sends EXTRA of movie details to
 *  DetailActivity through Intent.
 *
-*  Loading indicator displays while data being captured in Async background thread.
+*  Loading indicator displays while data being captured in Async Loader background thread.
 *
 *  Error message displays if no movie data returned.
 *
-*  Also sets up ActionBar spinner to select top-rated or most-popular movies and
+*  Also sets up ActionBar spinner to select top-rated, most-popular or favorite movies and
 *  sets OnItemSelectListener to listen for selection and reset data as needed.
 *
 * */
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler, LoaderManager.LoaderCallbacks<ArrayList<String[]>> {
 
+    /* A constant to save and restore the URL that is being displayed */
+    private static final String PREF_SELECTION = "selection";
+    private static final int DEFAULT_SPINNER_POSITION = 0; // Most Popular
+
+    private static final int MOVIEDB_SEARCH_LOADER = 76;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static int mSelected;
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
-    private boolean mPopularSelected;
     private boolean isConnected;
+    private SharedPreferences mSharedPreferences;
+
+    private ArrayList<String[]> mMovieCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         ConnectivityManager cm =
                 (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -79,8 +94,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
          * hidden when no data is loading.
          */
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-
-        loadMovieData();
     }
 
 /*
@@ -96,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void loadMovieData() {
         showMovieGridView();
-        new FetchMovieTask().execute(mPopularSelected);
+        getSupportLoaderManager().initLoader(MOVIEDB_SEARCH_LOADER, null, this).forceLoad();
     }
 
     /**
@@ -136,74 +149,87 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     }
 
-    public class FetchMovieTask extends AsyncTask<Boolean, Void, ArrayList<String[]>> {
-
-        @Override
-        protected ArrayList<String[]> doInBackground(Boolean... selectPopular) {
-            URL movieRequestUrl = NetworkUtils.buildUrl(selectPopular[0]);
-
-            try {
-                String jsonMovieResponse = NetworkUtils
-                        .getResponseFromHttpUrl(movieRequestUrl);
-
-                ArrayList<String[]> simpleJsonMovieData = MovieJsonUtils
-                        .getMovieStringsFromJson(MainActivity.this, jsonMovieResponse);
-
-                return simpleJsonMovieData;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<String[]> movieData) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if (movieData != null && !movieData.isEmpty()) {
-                showMovieGridView();
-                mMovieAdapter.setMovieData(movieData);
-            } else {
-                if (!isConnected) {
-                    showErrorMessage();
+    @Override
+    public Loader<ArrayList<String[]>> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<ArrayList<String[]>>(this) {
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                mLoadingIndicator.setVisibility(View.VISIBLE);
+                if (mMovieCache != null) {
+                    deliverResult(mMovieCache);
                 }
+            }
+
+            @Override
+            public void deliverResult(ArrayList<String[]> data) {
+                mMovieCache = data;
+                super.deliverResult(data);
+            }
+
+            @Override
+            public ArrayList<String[]> loadInBackground() {
+
+                URL selectionUrl = NetworkUtils.buildUrl(this.getContext(), mSelected);
+
+                try {
+                    String jsonMovieResponse = NetworkUtils
+                            .getResponseFromHttpUrl(selectionUrl);
+
+                    return MovieJsonUtils.getMovieStringsFromJson(MainActivity.this, jsonMovieResponse);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ArrayList<String[]>> loader, ArrayList<String[]> movieData) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if (movieData != null && !movieData.isEmpty()) {
+            showMovieGridView();
+            mMovieAdapter.setMovieData(movieData);
+        } else {
+            if (!isConnected) {
+                showErrorMessage();
             }
         }
     }
 
+
+    @Override
+    public void onLoaderReset(Loader<ArrayList<String[]>> loader) {
+
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-
         MenuItem item = menu.findItem(R.id.spinner);
         Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.spinner, R.layout.spinner_menu);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(mSharedPreferences.getInt(PREF_SELECTION, DEFAULT_SPINNER_POSITION));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selected = (String) parent.getItemAtPosition(position);
-                mPopularSelected = selected.equals(getString(R.string.most_popular));
+                mSelected = position;
+                mSharedPreferences.edit().putInt(getString(R.string.settings_selection_key), position).apply();
                 loadMovieData();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mPopularSelected = true;
+                mSelected = mSharedPreferences.getInt(getString(R.string.settings_selection_key), DEFAULT_SPINNER_POSITION);
                 loadMovieData();
             }
         });
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.spinner, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinner.setAdapter(adapter);
-
         return true;
     }
 }

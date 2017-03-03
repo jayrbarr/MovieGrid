@@ -2,6 +2,8 @@ package com.example.jayrb.moviegrid.utilities;
 
 import android.content.Context;
 
+import com.example.jayrb.moviegrid.DetailActivity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +27,8 @@ public final class MovieJsonUtils {
         final String MDB_RELDATE = "release_date";  // movieArray param 3
         final String MDB_VOTE = "vote_average";  // movieArray param 4
         final int NUM_PARAMS = 5;
+        final int BEGIN_YEAR = 0;
+        final int END_YEAR = 4;
 
         JSONObject movieJson = new JSONObject(movieJsonStr);
 
@@ -39,11 +43,11 @@ public final class MovieJsonUtils {
             /* get the ith movie */
             String[] movieArray = new String[NUM_PARAMS];
             JSONObject movieObject = resultsArray.getJSONObject(i);
-            movieArray[0] = movieObject.getString(MDB_THUMBPATH);
-            movieArray[2] = movieObject.getString(MDB_OVERVIEW);
-            movieArray[1] = movieObject.getString(MDB_TITLE);
-            movieArray[3] = movieObject.getString(MDB_RELDATE);
-            movieArray[4] = movieObject.getString(MDB_VOTE);
+            movieArray[DetailActivity.THUMB_URL] = movieObject.getString(MDB_THUMBPATH);
+            movieArray[DetailActivity.SYNOPSIS] = movieObject.getString(MDB_OVERVIEW);
+            movieArray[DetailActivity.TITLE] = movieObject.getString(MDB_TITLE);
+            movieArray[DetailActivity.YEAR_OF_RELEASE] = movieObject.getString(MDB_RELDATE).substring(BEGIN_YEAR, END_YEAR);
+            movieArray[DetailActivity.VOTER_AVERAGE] = movieObject.getString(MDB_VOTE);
 
             /* add ith movie to ArrayList*/
             parsedMovieData.add(movieArray);

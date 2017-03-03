@@ -4,10 +4,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.jayrb.moviegrid.data.FavoritesContract.*;
+import com.example.jayrb.moviegrid.data.FavoritesContract.FavoritesEntry;
 
 /**
- * Created by jayrb on 2/28/2017.
+ * SQLiteDatabase favoritesDb.db constructor and methods.
+ * Stores movie favorites locally for online and offline access.
  */
 
 public class FavoritesDbHelper extends SQLiteOpenHelper {
@@ -38,7 +39,7 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
                 FavoritesEntry.COLUMN_OVERVIEW      + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_YEAR          + " INTEGER NOT NULL, " +
                 FavoritesEntry.COLUMN_VOTE          + " DECIMAL(2,1) NOT NULL, " +
-                FavoritesEntry.COLUMN_THUMBPATH     + " TEXT NOT NULL);";
+                FavoritesEntry.COLUMN_THUMB + " BLOB NOT NULL);";
         db.execSQL(CREATE_TABLE);
 
     }

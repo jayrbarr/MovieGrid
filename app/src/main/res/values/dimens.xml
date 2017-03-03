@@ -9,4 +9,18 @@
 
     <dimen name="cardview_corner_radius">0dp</dimen>
 
+    <dimen name="detail_view_horiz">24dp</dimen>
+    <dimen name="movie_title_verti">48dp</dimen>
+
+    <dimen name="detail_thumb_width">120dp</dimen>
+    <dimen name="detail_view_small_gap">8dp</dimen>
+    <dimen name="detail_view_double_gap">16dp</dimen>
+    <dimen name="detail_divider_thickness">2dp</dimen>
+    <dimen name="detail_view_large_gap">40dp</dimen>
+
+    // Text Sizes
+    <dimen name="detail_movie_title">48sp</dimen>
+    <dimen name="button_favorite">12sp</dimen>
+
+
 </resources>
