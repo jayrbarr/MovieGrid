@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Layout for a single movie trailer list item -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="@dimen/detail_view_small_gap">
+
+    <ImageView
+        android:id="@+id/trailer_image"
+        android:layout_width="@dimen/list_item_height"
+        android:layout_height="@dimen/list_item_height"
+        android:contentDescription="@string/play_trailer"
+        android:src="@drawable/ic_play_arrow" />
+
+    <TextView
+        android:id="@+id/trailer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/detail_view_small_gap"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textStyle="bold" />
+
+</LinearLayout>

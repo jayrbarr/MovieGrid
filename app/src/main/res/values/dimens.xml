@@ -22,5 +22,8 @@
     <dimen name="detail_movie_title">48sp</dimen>
     <dimen name="button_favorite">12sp</dimen>
 
+    // List item height for trailers and reviews
+    <dimen name="list_item_height">88dp</dimen>
+
 
 </resources>

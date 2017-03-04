@@ -45,5 +45,7 @@ public class FavoritesContract {
        public static final String COLUMN_YEAR = "year";
        public static final String COLUMN_VOTE = "vote";
        public static final String COLUMN_THUMB = "thumb";
+       public static final String COLUMN_TRAILERS = "trailers";
+       public static final String COLUMN_REVIEWS = "reviews";
    }
 }

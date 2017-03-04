@@ -39,7 +39,10 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
                 FavoritesEntry.COLUMN_OVERVIEW      + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_YEAR          + " INTEGER NOT NULL, " +
                 FavoritesEntry.COLUMN_VOTE          + " DECIMAL(2,1) NOT NULL, " +
-                FavoritesEntry.COLUMN_THUMB + " BLOB NOT NULL);";
+                FavoritesEntry.COLUMN_THUMB + " BLOB NOT NULL, " +
+                FavoritesEntry.COLUMN_TRAILERS + " TEXT, " +
+                FavoritesEntry.COLUMN_REVIEWS + " TEXT"
+                + ");";
         db.execSQL(CREATE_TABLE);
 
     }

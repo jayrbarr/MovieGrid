@@ -41,7 +41,6 @@ public final class NetworkUtils {
     * */
     public static URL buildUrl(Context context, int selection) {
         Uri builtUri;
-        Log.d(TAG, "selection = " + selection);
         if (selection == MOST_POPULAR) {
             builtUri = Uri.parse(MOVIES_BASE)
                     .buildUpon()
@@ -96,6 +95,7 @@ public final class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        Log.d(TAG, "url = " + url);
         return url;
     }
 

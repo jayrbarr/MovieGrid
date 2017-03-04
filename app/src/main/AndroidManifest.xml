@@ -24,10 +24,18 @@
         <activity
             android:name=".DetailActivity"
             android:parentActivityName=".MainActivity">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <!-- Content provider for favorites data -->
+        <provider
+            android:name=".data.FavoritesProvider"
+            android:authorities="com.example.jayrb.moviegrid"
+            android:exported="false" />
     </application>
 
 </manifest>

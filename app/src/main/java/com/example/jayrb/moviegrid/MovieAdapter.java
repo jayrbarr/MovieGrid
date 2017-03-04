@@ -39,7 +39,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
     @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
-        String thumbPath = mMovieList.get(position)[0];
+        String thumbPath = mMovieList.get(position)[DetailActivity.THUMB_URL];
         String thumbUrl = FETCH_IMAGE_URL_BASE + thumbPath;
         Uri uri = Uri.parse(thumbUrl);
         Context context = holder.mMovieThumb.getContext();

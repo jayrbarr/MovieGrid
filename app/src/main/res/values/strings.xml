@@ -21,12 +21,19 @@
     // Detail view content description
     <string name="poster_content">Movie Poster</string>
     <string name="section_divider">Section Divider</string>
+    <string name="play_trailer">Click to play movie trailer.</string>
 
-    // Detail view trailers heading
+    // Detail view headings
     <string name="trailers">Trailers:</string>
+    <string name="reviews">Reviews:</string>
+
+    // Detail view empty movie results strings
+    <string name="no_trailers">Sorry. No trailers are currently available for this movie.</string>
+    <string name="no_reviews">Sorry. No reviews are currently available for this movie.</string>
+
 
     // Default detail view strings
-    <string name="detail_synopsis">Every child comes into the world full of promise, and none more so than Chappie: he is gifted, special, a prodigy. Chappie he is a robot.</string>
+    <string name="detail_synopsis">Every child comes into the world full of promise, and none more so than Chappie: he is gifted, special, a prodigy. Chappie is a robot.</string>
     <string name="detail_rating">8.1/10</string>
     <string name="detail_runtime">120min</string>
     <string name="detail_year">2015</string>

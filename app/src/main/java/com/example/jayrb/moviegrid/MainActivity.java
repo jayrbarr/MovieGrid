@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             @Override
             public void deliverResult(ArrayList<String[]> data) {
                 mMovieCache = data;
+                mLoadingIndicator.setVisibility(View.INVISIBLE);
                 super.deliverResult(data);
             }
 
