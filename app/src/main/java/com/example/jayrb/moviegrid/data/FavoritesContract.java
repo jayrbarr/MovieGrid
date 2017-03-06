@@ -1,5 +1,6 @@
 package com.example.jayrb.moviegrid.data;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -34,15 +35,27 @@ public class FavoritesContract {
        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                .appendPath(PATH_FAVORITES)
                .build();
+       /**
+        * The MIME type of the {@link #CONTENT_URI} for a list of favorites.
+        */
+       public static final String CONTENT_LIST_TYPE =
+               ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
+
+       /**
+        * The MIME type of the {@link #CONTENT_URI} for a single favorite.
+        */
+       public static final String CONTENT_ITEM_TYPE =
+               ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_FAVORITES;
 
        // Favorites table
        public static final String TABLE_NAME = "favorites";
 
        // Additional columns (_ID created automatically)
-       public static final String COLUMN_IDENTIFIER = "identifier";
+       public static final String COLUMN_MOVIE_ID = "movie_id";
        public static final String COLUMN_TITLE = "title";
        public static final String COLUMN_OVERVIEW = "overview";
        public static final String COLUMN_YEAR = "year";
+       public static final String COLUMN_RUNTIME = "runtime";
        public static final String COLUMN_VOTE = "vote";
        public static final String COLUMN_THUMB = "thumb";
        public static final String COLUMN_TRAILERS = "trailers";

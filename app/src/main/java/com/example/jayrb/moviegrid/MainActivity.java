@@ -3,11 +3,12 @@ package com.example.jayrb.moviegrid;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.LoaderManager;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
@@ -15,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.jayrb.moviegrid.data.FavoritesContract.FavoritesEntry;
 import com.example.jayrb.moviegrid.utilities.MovieJsonUtils;
 import com.example.jayrb.moviegrid.utilities.NetworkUtils;
 
@@ -45,23 +48,128 @@ import java.util.ArrayList;
 *
 * */
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler, LoaderManager.LoaderCallbacks<ArrayList<String[]>> {
+public class MainActivity extends AppCompatActivity implements
+        MovieAdapter.MovieAdapterOnClickHandler, CursorRecyclerViewAdapter.CursorAdapterOnClickHandler {
 
-    /* A constant to save and restore the URL that is being displayed */
-    private static final String PREF_SELECTION = "selection";
-    private static final int DEFAULT_SPINNER_POSITION = 0; // Most Popular
+    public static final int DEFAULT_SPINNER_POSITION = 0; // Most Popular
+    public static final int FAVORITES_SELECTED = 2;
 
     private static final int MOVIEDB_SEARCH_LOADER = 76;
+    private static final int FAVORITES_CURSOR_LOADER = 19;
     private static final String TAG = MainActivity.class.getSimpleName();
     private static int mSelected;
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private FavoritesAdapter mFavoritesAdapter;
     private boolean isConnected;
     private SharedPreferences mSharedPreferences;
 
     private ArrayList<String[]> mMovieCache;
+    private LoaderCallbacks<Cursor> favoritesLoaderListener =
+            new LoaderCallbacks<Cursor>() {
+                @Override
+                public Loader<Cursor> onCreateLoader(final int id, Bundle args) {
+                    String[] projection = {
+                            FavoritesEntry._ID,
+                            FavoritesEntry.COLUMN_MOVIE_ID,
+                            FavoritesEntry.COLUMN_THUMB
+                    };
+        /*
+         * Takes action based on the ID of the Loader that's being created
+         */
+                    switch (id) {
+                        case FAVORITES_CURSOR_LOADER:
+                            return new android.support.v4.content.CursorLoader(
+                                    getBaseContext(),           // Parent activity context
+                                    FavoritesEntry.CONTENT_URI, // Table to query
+                                    projection,                 // Projection to return
+                                    null,                       // No selection clause
+                                    null,                       // No selection arguments
+                                    null                        // Default sort order
+                            );
+                        default:
+                            // An invalid id was passed in
+                            return null;
+                    }
+                }
+
+                @Override
+                public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+
+                    if (cursor.moveToFirst()) {
+                        // Move favorites data query into adapter for GridView
+                        mFavoritesAdapter.swapCursor(cursor);
+                    } else {
+                        showErrorMessage();
+                    }
+
+                }
+
+                @Override
+                public void onLoaderReset(Loader<Cursor> loader) {
+                    mFavoritesAdapter.swapCursor(null);
+                }
+            };
+    private LoaderCallbacks<ArrayList<String[]>> movieDbLoaderListener =
+            new LoaderCallbacks<ArrayList<String[]>>() {
+                @Override
+                public Loader<ArrayList<String[]>> onCreateLoader(int id, Bundle args) {
+                    return new AsyncTaskLoader<ArrayList<String[]>>(getBaseContext()) {
+                        @Override
+                        protected void onStartLoading() {
+                            super.onStartLoading();
+                            mLoadingIndicator.setVisibility(View.VISIBLE);
+                            if (mMovieCache != null) {
+                                deliverResult(mMovieCache);
+                            }
+                        }
+
+                        @Override
+                        public void deliverResult(ArrayList<String[]> data) {
+                            mMovieCache = data;
+                            mLoadingIndicator.setVisibility(View.INVISIBLE);
+                            super.deliverResult(data);
+                        }
+
+                        @Override
+                        public ArrayList<String[]> loadInBackground() {
+
+                            URL selectionUrl = NetworkUtils.buildUrl(this.getContext(), mSelected);
+
+                            try {
+                                String jsonMovieResponse = NetworkUtils
+                                        .getResponseFromHttpUrl(selectionUrl);
+
+                                return MovieJsonUtils.getMovieStringsFromJson(MainActivity.this, jsonMovieResponse);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                return null;
+                            }
+                        }
+                    };
+                }
+
+                @Override
+                public void onLoadFinished(Loader<ArrayList<String[]>> loader, ArrayList<String[]> movieData) {
+                    mLoadingIndicator.setVisibility(View.INVISIBLE);
+                    if (movieData != null && !movieData.isEmpty()) {
+                        showMovieGridView();
+                        mMovieAdapter.setMovieData(movieData);
+                    } else {
+                        if (!isConnected) {
+                            showErrorMessage();
+                        }
+                    }
+                }
+
+                @Override
+                public void onLoaderReset(Loader<ArrayList<String[]>> loader) {
+
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +194,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        mMovieAdapter = new MovieAdapter(this);
-        mRecyclerView.setAdapter(mMovieAdapter);
-
         /*
          * The ProgressBar that will indicate to the user that we are loading data. It will be
          * hidden when no data is loading.
@@ -109,7 +214,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private void loadMovieData() {
         showMovieGridView();
-        getSupportLoaderManager().initLoader(MOVIEDB_SEARCH_LOADER, null, this).forceLoad();
+        if (mSelected == FAVORITES_SELECTED) {
+            mFavoritesAdapter = new FavoritesAdapter(this, null, this);
+            mRecyclerView.setAdapter(mFavoritesAdapter);
+            getSupportLoaderManager().initLoader(FAVORITES_CURSOR_LOADER, null, favoritesLoaderListener).forceLoad();
+
+
+        } else {
+            mMovieAdapter = new MovieAdapter(this);
+            mRecyclerView.setAdapter(mMovieAdapter);
+            getSupportLoaderManager().initLoader(MOVIEDB_SEARCH_LOADER, null, movieDbLoaderListener).forceLoad();
+        }
     }
 
     /**
@@ -120,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
      */
     @Override
     public void onClick(String[] movieDetails) {
+        Log.d(TAG, "MovieDetails = " + movieDetails[0] + " " + movieDetails[1]);
         startActivity( new Intent(this, DetailActivity.class).putExtra(Intent.EXTRA_TEXT, movieDetails) );
     }
 
@@ -142,70 +258,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         /* First, hide the currently visible data */
         mRecyclerView.setVisibility(View.INVISIBLE);
         /* Then, show the error */
-        if(!isConnected) {
+        if (!isConnected && mSelected != FAVORITES_SELECTED) {
             mErrorMessageDisplay.setText(R.string.no_internet);
+        } else {
+            mErrorMessageDisplay.setText(R.string.no_movies_to_display);
         }
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
 
     }
-
-    @Override
-    public Loader<ArrayList<String[]>> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<ArrayList<String[]>>(this) {
-            @Override
-            protected void onStartLoading() {
-                super.onStartLoading();
-                mLoadingIndicator.setVisibility(View.VISIBLE);
-                if (mMovieCache != null) {
-                    deliverResult(mMovieCache);
-                }
-            }
-
-            @Override
-            public void deliverResult(ArrayList<String[]> data) {
-                mMovieCache = data;
-                mLoadingIndicator.setVisibility(View.INVISIBLE);
-                super.deliverResult(data);
-            }
-
-            @Override
-            public ArrayList<String[]> loadInBackground() {
-
-                URL selectionUrl = NetworkUtils.buildUrl(this.getContext(), mSelected);
-
-                try {
-                    String jsonMovieResponse = NetworkUtils
-                            .getResponseFromHttpUrl(selectionUrl);
-
-                    return MovieJsonUtils.getMovieStringsFromJson(MainActivity.this, jsonMovieResponse);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<ArrayList<String[]>> loader, ArrayList<String[]> movieData) {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if (movieData != null && !movieData.isEmpty()) {
-            showMovieGridView();
-            mMovieAdapter.setMovieData(movieData);
-        } else {
-            if (!isConnected) {
-                showErrorMessage();
-            }
-        }
-    }
-
-
-    @Override
-    public void onLoaderReset(Loader<ArrayList<String[]>> loader) {
-
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -216,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 R.array.spinner, R.layout.spinner_menu);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        spinner.setSelection(mSharedPreferences.getInt(PREF_SELECTION, DEFAULT_SPINNER_POSITION));
+        spinner.setSelection(mSharedPreferences.getInt(getString(R.string.settings_selection_key), DEFAULT_SPINNER_POSITION));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

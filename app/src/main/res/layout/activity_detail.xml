@@ -84,6 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/detail_view_small_gap"
             android:background="@drawable/favorite_button"
+            android:onClick="checkFavorite"
             android:text="@string/button_favorite"
             android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
             android:textColor="@color/colorPrimary"

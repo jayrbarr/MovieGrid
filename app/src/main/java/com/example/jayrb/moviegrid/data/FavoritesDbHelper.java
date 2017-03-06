@@ -34,10 +34,11 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
         // Create favorites table
         final String CREATE_TABLE = "CREATE TABLE " + FavoritesEntry.TABLE_NAME + " (" +
                 FavoritesEntry._ID                  + " INTEGER PRIMARY KEY, " +
-                FavoritesEntry.COLUMN_IDENTIFIER    + " INTEGER UNIQUE NOT NULL, " +
+                FavoritesEntry.COLUMN_MOVIE_ID + " INTEGER UNIQUE NOT NULL, " +
                 FavoritesEntry.COLUMN_TITLE         + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_OVERVIEW      + " TEXT NOT NULL, " +
                 FavoritesEntry.COLUMN_YEAR          + " INTEGER NOT NULL, " +
+                FavoritesEntry.COLUMN_RUNTIME + " INTEGER NOT NULL, " +
                 FavoritesEntry.COLUMN_VOTE          + " DECIMAL(2,1) NOT NULL, " +
                 FavoritesEntry.COLUMN_THUMB + " BLOB NOT NULL, " +
                 FavoritesEntry.COLUMN_TRAILERS + " TEXT, " +

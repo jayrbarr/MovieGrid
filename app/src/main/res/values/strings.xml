@@ -3,6 +3,7 @@
     <string name="movie_name">Tommy Boy</string>
     <string name="error_message">An error has occurred. Please try again.</string>
     <string name="no_internet">Unable to access internet. Check connection and try again.</string>
+    <string name="no_movies_to_display">No movies to display.</string>
     <string-array name="spinner">
         <item>@string/most_popular</item>
         <item>@string/top_rated</item>
@@ -17,6 +18,7 @@
 
     // Detail view button to mark as favorite
     <string name="button_favorite">Mark As Favorite</string>
+    <string name="remove_favorite">Remove Favorite</string>
 
     // Detail view content description
     <string name="poster_content">Movie Poster</string>
@@ -31,6 +33,25 @@
     <string name="no_trailers">Sorry. No trailers are currently available for this movie.</string>
     <string name="no_reviews">Sorry. No reviews are currently available for this movie.</string>
 
+    // Favorites
+    <string name="favorite_saved">Favorite saved!</string>
+    <string name="favorite_error">Error saving favorite. Not saved. Try again.</string>
+    <string name="no_movie_id_error">Movie requires an ID.</string>
+    <string name="no_title_error">Movie requires a title.</string>
+    <string name="no_synopsis_error">Movie requires a synopsis.</string>
+    <string name="no_year_error">Movie requires a year of release.</string>
+    <string name="no_runtime_error">Movie requires a runtime.</string>
+    <string name="no_vote_error">Movie requires a user vote average.</string>
+    <string name="no_thumb_error">Movie requires a thumbnail image.</string>
+    <string name="no_row_inserted">Failed to insert row for\u0020</string>
+    <string name="insert_not_supported">Insertion is not supported for\u0020</string>
+    <string name="unknown_uri">Cannot query unknown URI\u0020</string>
+    <string name="deletion_unsupported">Deletion is not supported for\u0020</string>
+    <string name="unknown_uri_type">Unknown URI\u0020</string>
+    <string name="with_match">\u0020with match\u0020</string>
+    <string name="remove_favorite_error">Error with removing favorite. Try again.</string>
+    <string name="favorite_removed">Favorite removed.</string>
+
 
     // Default detail view strings
     <string name="detail_synopsis">Every child comes into the world full of promise, and none more so than Chappie: he is gifted, special, a prodigy. Chappie is a robot.</string>
@@ -42,7 +63,5 @@
     // Preference Strings
     <string name="settings_selection_label">Selection</string>
     <string name="settings_selection_key" translatable="false">selection</string>
-    <string name="settings_selection_default">@string/most_popular</string>
-
 
 </resources>
