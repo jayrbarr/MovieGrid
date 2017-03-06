@@ -3,7 +3,6 @@ package com.example.jayrb.moviegrid;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,11 +53,9 @@ public class FavoritesAdapter extends CursorRecyclerViewAdapter<FavoritesAdapter
             public void onClick(View v) {
                 String[] movieDetail = new String[2];
                 int position = (Integer) v.getTag();
-                Log.d(TAG, "Position = " + position);
                 cursor.moveToPosition(position);
                 movieDetail[0] = Integer.toString(cursor.getInt(cursor
                         .getColumnIndexOrThrow(FavoritesEntry.COLUMN_MOVIE_ID)));
-                Log.d(TAG, "Movie ID = " + movieDetail[0]);
                 movieDetail[1] = "/z09QAf8WbZncbitewNk6lKYMZsh.jpg";
                 mClickHandler.onClick(movieDetail);
             }

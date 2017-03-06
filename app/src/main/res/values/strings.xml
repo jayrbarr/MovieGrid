@@ -20,7 +20,8 @@
     <string name="button_favorite">Mark As Favorite</string>
     <string name="remove_favorite">Remove Favorite</string>
 
-    // Detail view content description
+    // Content descriptions
+    <string name="movie_thumbnail">Movie Thumbnail</string>
     <string name="poster_content">Movie Poster</string>
     <string name="section_divider">Section Divider</string>
     <string name="play_trailer">Click to play movie trailer.</string>

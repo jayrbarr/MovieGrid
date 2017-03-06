@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
+            android:contentDescription="@string/movie_thumbnail"
             android:scaleType="fitCenter" />
 
 </android.support.v7.widget.CardView>
