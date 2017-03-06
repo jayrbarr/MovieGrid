@@ -2,7 +2,6 @@ package com.example.jayrb.moviegrid.utilities;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import com.example.jayrb.moviegrid.BuildConfig;
 
@@ -95,7 +94,6 @@ public final class NetworkUtils {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, "url = " + url);
         return url;
     }
 
